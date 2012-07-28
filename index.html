@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en-us" class="no-js">
+<head>
+	<meta charset="utf-8">
+	<title dir="ltr">Anchor points demo</title>
+	<style>
+
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+
+		#container {
+			background: url(cat.jpg) center center no-repeat;
+			background-size: cover;
+			position: relative;
+			width: 100%;
+			height: 100%;
+		}
+
+		#point-a, #point-b {
+			display: block;
+			width: 20px;
+			height: 20px;
+			text-align: center;
+			line-height: 20px;
+			color: white;
+			font-family: sans-serif;
+			position: absolute;
+			text-decoration: none;
+		}
+
+		#point-a {
+			top: 17%;
+			left: 69%;
+			background-color: red;
+		}
+
+		#point-b {
+			top: 58%;
+			left: 29%;
+			background-color: blue;
+		}
+	</style>
+</head>
+<body>
+
+	<div id="container">
+		<a href="#" id="point-a">A</a>
+		<a href="#" id="point-b">B</a>
+	</div>
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.1.min.js"><\/script>')</script>
+	<script>
+		jQuery(function($){
+
+			var base = { wratio: 800/600, hratio: 600/800 };
+			var log = $('#log .text');
+			var container = $('#container');
+			var points = container.find('a');
+
+			points.each(function(){
+				$(this).data('basePosition', {
+					left: parseInt($(this).css('left')) - 50, 
+					top: parseInt($(this).css('top')) - 50
+				});
+			});
+
+			$(window).resize(function(){
+				var current = {width: container.innerWidth(), height: container.innerHeight() };
+				current.wratio = current.width / current.height;
+				current.hratio = current.height / current.width;
+
+				if(current.wratio < base.wratio) { // image has left + right sides cropped off
+					// recalculate left percentage values based on amount of image showing.
+					var actual = current.height * base.wratio;
+					var cropRatio = current.width / actual;
+
+					points.each(function(){
+						var adjusted = ($(this).data('basePosition').left / cropRatio) + 50;
+						$(this).css({left: adjusted+'%', top: ''});
+					});
+
+				} else if(current.wratio > base.wratio)  { // image has top + bottom sides cropped off
+					// recalculate left percentage values based on amount of image showing.
+					var actual = current.width * base.hratio;
+					var cropRatio = current.height / actual;
+
+					points.each(function(){
+						var adjusted = ($(this).data('basePosition').top / cropRatio) + 50;
+						$(this).css({left: '', top: adjusted+'%'});
+					});
+				} else {
+					points.each(function(){
+						$(this).css({ left: '', top: ''});
+					});
+				}
+			});
+		});
+	</script>
+</body>
+</html>
